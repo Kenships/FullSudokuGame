@@ -140,7 +140,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2267524862398241078}
         m_TargetAssemblyTypeName: GridUnit, Assembly-CSharp
-        m_MethodName: Increment
+        m_MethodName: Select
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -163,8 +163,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 3468873284914985117}
-  button: {fileID: 2230811363600399683}
   background: {fileID: 5390764774381072851}
+  onSelect: {fileID: 11400000, guid: fa655ec6af2eb694193538d6185cfa98, type: 2}
   valueSize: 70
   noteSize: 24
   defaultColor: {r: 1, g: 1, b: 1, a: 1}

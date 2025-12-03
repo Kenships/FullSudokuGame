@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Obvious.Soap;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,8 +10,8 @@ public class GridUnit : MonoBehaviour
     private const string MSPACE = "<mspace=0.5em>";
     [Header("References")]
     [SerializeField] TextMeshProUGUI text;
-    [SerializeField] Button button;
     [SerializeField] Image background;
+    [SerializeField] private ScriptableEventVector2Int onSelect;
     [Space]
     [Header("Font Scale")]
     [SerializeField] private int valueSize;
@@ -22,8 +23,8 @@ public class GridUnit : MonoBehaviour
     [SerializeField] private Color selectColor;
     [SerializeField] private Color defaultFontColor;
     [SerializeField] private Color lockedFontColor;
-    
-    
+
+    private Vector2Int m_position;
 
     private int m_value;
     private bool[] m_notes;
@@ -31,10 +32,12 @@ public class GridUnit : MonoBehaviour
     
     private bool[] m_boldNotes;
 
-    public void Initialize(int value, bool lockNumber = false)
+    public void Initialize(Vector2Int position, int value, bool lockNumber = false)
     {
+        m_position = position;
         m_value = value;
         m_notes = new bool[9];
+        m_boldNotes = new bool[9];
         m_isLocked = lockNumber;
     }
 
@@ -110,6 +113,11 @@ public class GridUnit : MonoBehaviour
         text.gameObject.SetActive(true);
     }
 
+    public void Select()
+    {
+        onSelect.Raise(m_position);
+    }
+
     public void Highlight(bool selected = false)
     {
         background.color = selected ? selectColor : highlightColor;
@@ -124,14 +132,28 @@ public class GridUnit : MonoBehaviour
 
     public void BoldNote(int note)
     {
+        if (!m_notes[note - 1] || m_value != 0) return;
+        
         m_boldNotes[note - 1] = true;
         UpdateVisual();
     }
 
-    public void UnboldNote(int note)
+    public void UnboldNote(int note, bool update = true)
     {
+        if (!m_boldNotes[note - 1]) return;
+        
         m_boldNotes[note - 1] = false;
-        UpdateVisual();
+        
+        if (update)
+            UpdateVisual();
+    }
+
+    public void UnboldAll()
+    {
+        for (int r = 1; r <= 9; r++)
+        {
+            UnboldNote(r, false);
+        }
     }
 
     #endregion

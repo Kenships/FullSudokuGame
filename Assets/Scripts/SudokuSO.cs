@@ -8,7 +8,7 @@ public class SudokuSO : ScriptableObject
 {
     // Use a serializable wrapper for rows so Unity can serialize it cleanly
     [SerializeField] private SudokuRow[] rows = new SudokuRow[9];
-
+#if UNITY_EDITOR
     private void OnValidate()
     {
         // Ensure 9x9 size and default values
@@ -37,7 +37,7 @@ public class SudokuSO : ScriptableObject
             }
         }
     }
-
+#endif
     /// <summary>
     /// Convenience getter/setter to treat it as a 2D array in code.
     /// </summary>
