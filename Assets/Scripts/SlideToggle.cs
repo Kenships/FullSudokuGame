@@ -73,6 +73,12 @@ public class SlideToggle : Selectable, IPointerClickHandler, ISubmitHandler, ICa
         m_toggleRectTransform = toggleBall.GetComponent<RectTransform>();
         m_backgroundRectTransform = background.gameObject.GetComponent<RectTransform>();
         SetAnchors();
+        if (m_isOn)
+        {
+            //Swap start and end positions
+            (m_toggleStart, m_toggleEnd) = (m_toggleEnd, m_toggleStart);
+        }
+        
         PlayEffect(true);
     }
     protected override void Start()
@@ -128,7 +134,6 @@ public class SlideToggle : Selectable, IPointerClickHandler, ISubmitHandler, ICa
 
         Tween.UIAnchoredPositionX(
             target: m_toggleRectTransform,
-            startValue: m_isOn ? m_toggleStart : m_toggleEnd,
             endValue: m_isOn ? m_toggleEnd : m_toggleStart,
             ease: Ease.InOutExpo,
             duration: instant ? 0 : animationTime,
@@ -136,7 +141,6 @@ public class SlideToggle : Selectable, IPointerClickHandler, ISubmitHandler, ICa
         ).Group(
             Tween.Color(
                 target: background,
-                startValue: m_isOn ? offColor : onColor,
                 endValue: m_isOn ? onColor : offColor,
                 duration: instant ? 0 : animationTime,
                 ease: Ease.InOutExpo,
