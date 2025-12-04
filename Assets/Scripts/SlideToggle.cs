@@ -78,8 +78,6 @@ public class SlideToggle : Selectable, IPointerClickHandler, ISubmitHandler, ICa
             //Swap start and end positions
             (m_toggleStart, m_toggleEnd) = (m_toggleEnd, m_toggleStart);
         }
-        
-        PlayEffect(true);
     }
     protected override void Start()
     {
@@ -129,20 +127,30 @@ public class SlideToggle : Selectable, IPointerClickHandler, ISubmitHandler, ICa
             !Mathf.Approximately(m_toggleRectTransform.anchoredPosition.x, m_toggleEnd))
             SetAnchors();
 #endif
-
+        
         Tween.StopAll();
 
+        if (instant)
+        {
+            m_toggleRectTransform.anchoredPosition = m_isOn
+                ? new Vector2(m_toggleEnd, m_toggleRectTransform.anchoredPosition.y)
+                : new Vector2(m_toggleStart, m_toggleRectTransform.anchoredPosition.y);
+        
+            background.color = m_isOn ? onColor : offColor;
+            return;
+        }
+        
         Tween.UIAnchoredPositionX(
             target: m_toggleRectTransform,
             endValue: m_isOn ? m_toggleEnd : m_toggleStart,
             ease: Ease.InOutExpo,
-            duration: instant ? 0 : animationTime,
+            duration: animationTime,
             cycles: 1
         ).Group(
             Tween.Color(
                 target: background,
                 endValue: m_isOn ? onColor : offColor,
-                duration: instant ? 0 : animationTime,
+                duration: animationTime,
                 ease: Ease.InOutExpo,
                 cycles: 1
             ));
