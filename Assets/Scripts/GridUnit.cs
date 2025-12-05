@@ -54,9 +54,17 @@ public class GridUnit : MonoBehaviour
         m_value = value;
         UpdateVisual();
     }
+
+    public void ToggleNote(int note)
+    {
+        m_value = 0;
+        m_notes[note - 1] = !m_notes[note - 1];
+        UpdateVisual();
+    }
     
     public void AddNote(int note)
     {
+        m_value = 0;
         m_notes[note - 1] = true;
         UpdateVisual();
     }
@@ -181,7 +189,7 @@ public class GridUnit : MonoBehaviour
             }
             else
             {
-                result += " ";
+                result += "+";
             }
         }
         

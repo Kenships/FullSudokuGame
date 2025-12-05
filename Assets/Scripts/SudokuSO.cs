@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using UnityEngine;
-
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewSudoku", menuName = "Sudoku/Sudoku Grid")]

@@ -9,10 +9,17 @@ public class GameBoardVisual : MonoBehaviour
     [SerializeField]private GameObject gridPrefab;
     [SerializeField]private SudokuSO sudoku;
     [SerializeField]private ScriptableEventVector2Int onSelect;
+    [SerializeField]private ScriptableEventInt onValueInput;
+    [SerializeField]private ScriptableEventBool onModeChange;
+    [SerializeField]private ScriptableEventNoParam onDelete;
+    [SerializeField]private ScriptableEventNoParam onDeselect;
 
     private GridUnit[,] m_gridUnits;
     private List<GridUnit> m_highlightedGridUnits; 
 
+    private GridUnit m_selectedGridUnit;
+    private bool m_noteMode;
+    
     private void Awake()
     {
         m_gridUnits = new GridUnit[9, 9];
@@ -34,6 +41,28 @@ public class GameBoardVisual : MonoBehaviour
     private void Start()
     {
         onSelect.OnRaised += OnSelectRaised;
+        onValueInput.OnRaised += OnValueInputRaised;
+        onModeChange.OnRaised += OnModeChangeRaised;
+    }
+
+    private void OnModeChangeRaised(bool noteMode)
+    {
+        m_noteMode = noteMode;
+    }
+
+    private void OnValueInputRaised(int value)
+    {
+        if(!m_selectedGridUnit)
+            return;
+
+        if (m_noteMode)
+        {
+            m_selectedGridUnit.ToggleNote(value);
+        }
+        else
+        {
+            m_selectedGridUnit.SetValue(value);
+        }
     }
 
     private void OnSelectRaised(Vector2Int position)
@@ -62,7 +91,9 @@ public class GameBoardVisual : MonoBehaviour
         {
             gridUnit.Highlight();
         }
-        m_gridUnits[position.x, position.y].Highlight(true);
+        
+        m_selectedGridUnit = m_gridUnits[position.x, position.y];
+        m_selectedGridUnit.Highlight(true);
     }
 
     private void DeselectAll()
