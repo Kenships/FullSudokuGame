@@ -199,7 +199,7 @@ public class GridUnit : MonoBehaviour
         {
             if (m_notes[i])
             {
-                result += m_boldNotes[i] ? "<b>" + (i + 1): i + 1;
+                result += m_boldNotes[i] ? "<b>" + (i + 1) + "</b>": i + 1;
             }
             else
             {
@@ -217,6 +217,16 @@ public class GridUnit : MonoBehaviour
     public int GetValue()
     {
         return m_value;
+    }
+
+    public bool HasNote(int note)
+    {
+        return m_notes[note - 1];
+    }
+
+    public bool IsEmpty()
+    {
+        return IsNotesEmpty() && m_value == 0;
     }
     #endregion
 }

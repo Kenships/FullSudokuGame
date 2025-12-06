@@ -90,8 +90,6 @@ public class GameBoardController : MonoBehaviour
         //Cast to int
         Vector2Int castMoveDirection = new Vector2Int(Mathf.RoundToInt(moveDirection.x), Mathf.RoundToInt(moveDirection.y));
         
-        Debug.Log(castMoveDirection);
-        
         int newRow = m_selectedGridUnit.Position.x - castMoveDirection.y;
         int newCol = m_selectedGridUnit.Position.y + castMoveDirection.x;
 
@@ -131,7 +129,7 @@ public class GameBoardController : MonoBehaviour
         else
         {
             m_selectedGridUnit.SetValue(value);
-
+            OnSelectRaised(new Vector2Int(m_selectedGridUnit.Position.x, m_selectedGridUnit.Position.y));
             if (sudokuLogicCore.EvaluateSudoku(m_gridUnits) == SudokuLogicCore.EvaluationState.Solved)
             {
                 onSolved.Raise();
@@ -141,39 +139,64 @@ public class GameBoardController : MonoBehaviour
 
     private void OnSelectRaised(Vector2Int position)
     {
+        m_selectedGridUnit = m_gridUnits[position.x, position.y];
+        int selectedValue = m_selectedGridUnit.GetValue();
         DeselectAll();
-        for (int row = 0; row < 9; row++)
-        {
-            m_highlightedGridUnits.Add(m_gridUnits[row, position.y]);
-        }
-        for (int col = 0; col < 9; col++)
-        {
-            m_highlightedGridUnits.Add(m_gridUnits[position.x, col]);
-        }
 
         int boxRow = position.x / 3 * 3;
         int boxCol = position.y / 3 * 3;
-        for (int row = boxRow; row < boxRow + 3; row++)
+
+        for (int row = 0; row < 9; row++)
         {
-            for (int col = boxCol; col < boxCol + 3; col++)
+            for (int col = 0; col < 9; col++)
             {
-                m_highlightedGridUnits.Add(m_gridUnits[row, col]);
+                if (position.x == row || position.y == col)
+                {
+                    m_highlightedGridUnits.Add(m_gridUnits[row, col]);
+                }
+                
+                if (row >= boxRow && col >= boxCol && row < boxRow + 3 && col < boxCol + 3)
+                {
+                    m_highlightedGridUnits.Add(m_gridUnits[row, col]);
+                }
+                
+                if (selectedValue == 0)
+                {
+                    continue;
+                }
+                
+                if (m_gridUnits[row, col].GetValue() == m_selectedGridUnit.GetValue())
+                {
+                    m_highlightedGridUnits.Add(m_gridUnits[row, col]);
+                }
+                
+                if (m_gridUnits[row, col].HasNote(m_selectedGridUnit.GetValue()))
+                {
+                    m_highlightedGridUnits.Add(m_gridUnits[row, col]);
+                }
             }
         }
 
         foreach (GridUnit gridUnit in m_highlightedGridUnits)
         {
-            gridUnit.Highlight();
+            int value = gridUnit.GetValue();
+            if (selectedValue != 0 && value == 0 && !gridUnit.IsEmpty())
+            {
+                gridUnit.BoldNote(selectedValue);
+                continue;
+            }
+
+            bool selected = (gridUnit == m_selectedGridUnit) || (value != 0 && value == selectedValue);
+            
+            gridUnit.Highlight(selected);
         }
-        
-        m_selectedGridUnit = m_gridUnits[position.x, position.y];
-        m_selectedGridUnit.Highlight(true);
     }
 
     private void DeselectAll()
     {
         foreach (var gridUnit in m_highlightedGridUnits)
         {
+            gridUnit.UnboldAll();
             gridUnit.Unhighlight();
         }
         
