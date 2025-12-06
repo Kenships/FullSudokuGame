@@ -7,7 +7,11 @@ using UnityEngine.UI;
 
 public class GridUnit : MonoBehaviour
 {
+    #region Constants
     private const string MSPACE = "<mspace=0.5em>";
+    #endregion
+    
+    #region Serialized Fields
     [Header("References")]
     [SerializeField] TextMeshProUGUI text;
     [SerializeField] Image background;
@@ -23,8 +27,8 @@ public class GridUnit : MonoBehaviour
     [SerializeField] private Color selectColor;
     [SerializeField] private Color defaultFontColor;
     [SerializeField] private Color lockedFontColor;
-
-    private Vector2Int m_position;
+    #endregion
+    public Vector2Int Position { get; private set; }
 
     private int m_value;
     private bool[] m_notes;
@@ -34,7 +38,7 @@ public class GridUnit : MonoBehaviour
 
     public void Initialize(Vector2Int position, int value, bool lockNumber = false)
     {
-        m_position = position;
+        Position = position;
         m_value = value;
         m_notes = new bool[9];
         m_boldNotes = new bool[9];
@@ -50,7 +54,7 @@ public class GridUnit : MonoBehaviour
 
     public void SetValue(int value)
     {
-        Clear();
+        Erase();
         m_value = value;
         UpdateVisual();
     }
@@ -75,7 +79,7 @@ public class GridUnit : MonoBehaviour
         UpdateVisual();
     }
     
-    public void Clear()
+    public void Erase()
     {
         m_value = 0;
 
@@ -123,7 +127,7 @@ public class GridUnit : MonoBehaviour
 
     public void Select()
     {
-        onSelect.Raise(m_position);
+        onSelect.Raise(Position);
     }
 
     public void Highlight(bool selected = false)

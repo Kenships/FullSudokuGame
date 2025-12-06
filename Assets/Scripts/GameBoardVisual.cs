@@ -1,5 +1,7 @@
+
 using System;
 using System.Collections.Generic;
+using DefaultNamespace;
 using Obvious.Soap;
 using UnityEngine;
 
@@ -9,10 +11,9 @@ public class GameBoardVisual : MonoBehaviour
     [SerializeField]private GameObject gridPrefab;
     [SerializeField]private SudokuSO sudoku;
     [SerializeField]private ScriptableEventVector2Int onSelect;
-    [SerializeField]private ScriptableEventInt onValueInput;
-    [SerializeField]private ScriptableEventBool onModeChange;
-    [SerializeField]private ScriptableEventNoParam onDelete;
-    [SerializeField]private ScriptableEventNoParam onDeselect;
+    [SerializeField]private List<InputListenerBase> inputListeners;
+    [SerializeField]private BoolVariable noteMode;
+
 
     private GridUnit[,] m_gridUnits;
     private List<GridUnit> m_highlightedGridUnits; 
@@ -40,9 +41,72 @@ public class GameBoardVisual : MonoBehaviour
 
     private void Start()
     {
-        onSelect.OnRaised += OnSelectRaised;
-        onValueInput.OnRaised += OnValueInputRaised;
-        onModeChange.OnRaised += OnModeChangeRaised;
+        noteMode.OnValueChanged += OnModeChangeRaised;
+        
+        if (inputListeners is { Count: > 0 })
+        {
+            foreach (InputListenerBase listener in inputListeners)
+            {
+                listener.OnValueInput += OnValueInputRaised;
+                listener.OnEraseInput += OnEraseInput;
+                listener.OnMoveInput += OnMoveInput;
+                listener.OnSelectInput += OnSelectRaised;
+                listener.OnDeselectInput += OnDeselect;
+                listener.OnEscapeInput += OnDeselect;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        noteMode.OnValueChanged -= OnModeChangeRaised;
+
+        if (inputListeners is { Count: > 0 })
+        {
+            foreach (InputListenerBase listener in inputListeners)
+            {
+                listener.OnValueInput -= OnValueInputRaised;
+                listener.OnEraseInput -= OnEraseInput;
+                listener.OnMoveInput -= OnMoveInput;
+                listener.OnSelectInput -= OnSelectRaised;
+                listener.OnDeselectInput -= OnDeselect;
+                listener.OnEscapeInput -= OnDeselect;
+            }
+        }
+    }
+
+    private void OnMoveInput(Vector2 moveDirection)
+    {
+        if (!m_selectedGridUnit)
+        {
+            m_selectedGridUnit = m_gridUnits[0, 0];
+        }
+        
+        //Cast to int
+        Vector2Int castMoveDirection = new Vector2Int(Mathf.RoundToInt(moveDirection.x), Mathf.RoundToInt(moveDirection.y));
+        
+        Debug.Log(castMoveDirection);
+        
+        int newRow = m_selectedGridUnit.Position.x - castMoveDirection.y;
+        int newCol = m_selectedGridUnit.Position.y + castMoveDirection.x;
+
+        if (newRow >= 0 && newCol >= 0 && newRow < 9 && newCol < 9)
+        {
+            OnSelectRaised(new Vector2Int(newRow, newCol));
+        }
+    }
+
+    private void OnDeselect()
+    {
+        DeselectAll();
+    }
+    
+    private void OnEraseInput()
+    {
+        if (!m_selectedGridUnit)
+            return;
+
+        m_selectedGridUnit.Erase();
     }
 
     private void OnModeChangeRaised(bool noteMode)

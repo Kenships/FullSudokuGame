@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc3db9e77ae47a48298e1f9fc739bdc, type: 3}
+  m_Name: UIInputListener
+  m_EditorClassIdentifier: 
+  onValueInput: {fileID: 11400000, guid: 23ea216a7fc1e3947806ed8ae624d93a, type: 2}
+  onSelectInput: {fileID: 11400000, guid: fa655ec6af2eb694193538d6185cfa98, type: 2}
+  onErase: {fileID: 11400000, guid: 635770a4a324845449acfbfbe2ff15a8, type: 2}
+  onHint: {fileID: 11400000, guid: 4b3277f988c29944eb51d191383ef8b4, type: 2}

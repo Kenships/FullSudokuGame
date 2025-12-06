@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -237,7 +237,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '<mspace=0.5em>12345678 '
+  m_text: <mspace=0.5em>123456789
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: aa7b13d50ce4d6e43aafc40b3e527518, type: 2}
   m_sharedMaterial: {fileID: 4986204439622211442, guid: aa7b13d50ce4d6e43aafc40b3e527518, type: 2}
@@ -280,7 +280,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 2
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
