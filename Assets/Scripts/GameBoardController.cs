@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using DefaultNamespace;
 using Obvious.Soap;
+using SudokuLogic;
 using UnityEngine;
 
 public class GameBoardController : MonoBehaviour
@@ -13,6 +14,7 @@ public class GameBoardController : MonoBehaviour
     [SerializeField] private ScriptableEventVector2Int onSelect;
     [SerializeField] private List<InputListenerBase> inputListeners;
     [SerializeField] private BoolVariable noteModeVar;
+    [SerializeField] private ScriptableEventNoParam onSolved;
 
 
     private GridUnit[,] m_gridUnits;
@@ -20,9 +22,12 @@ public class GameBoardController : MonoBehaviour
 
     private GridUnit m_selectedGridUnit;
     private bool m_noteMode;
+
+    private SudokuLogicCore sudokuLogicCore;
     
     private void Awake()
     {
+        sudokuLogicCore = new SudokuLogicCore();
         m_gridUnits = new GridUnit[9, 9];
         m_highlightedGridUnits = new List<GridUnit>();
         for (int row = 0; row < 9; row++)
@@ -126,6 +131,11 @@ public class GameBoardController : MonoBehaviour
         else
         {
             m_selectedGridUnit.SetValue(value);
+
+            if (sudokuLogicCore.EvaluateSudoku(m_gridUnits) == SudokuLogicCore.EvaluationState.Solved)
+            {
+                onSolved.Raise();
+            }
         }
     }
 
