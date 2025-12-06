@@ -127,6 +127,9 @@ namespace UnityEngine.UI
 
         private void PlayEffect(bool instant)
         {
+            m_toggleRectTransform ??= toggleBall.GetComponent<RectTransform>();
+            m_backgroundRectTransform ??= background.gameObject.GetComponent<RectTransform>();
+            
 #if UNITY_EDITOR
             if (Tween.GetTweensCount(m_toggleRectTransform) == 0 &&
                 !Mathf.Approximately(m_toggleRectTransform.anchoredPosition.x, m_toggleStart) &&
