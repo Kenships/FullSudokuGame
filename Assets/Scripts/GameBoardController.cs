@@ -5,14 +5,14 @@ using DefaultNamespace;
 using Obvious.Soap;
 using UnityEngine;
 
-public class GameBoardVisual : MonoBehaviour
+public class GameBoardController : MonoBehaviour
 {
-    [SerializeField]private List<Transform> subGrids;
-    [SerializeField]private GameObject gridPrefab;
-    [SerializeField]private SudokuSO sudoku;
-    [SerializeField]private ScriptableEventVector2Int onSelect;
-    [SerializeField]private List<InputListenerBase> inputListeners;
-    [SerializeField]private BoolVariable noteMode;
+    [SerializeField] private List<Transform> subGrids;
+    [SerializeField] private GameObject gridPrefab;
+    [SerializeField] private SudokuSO sudoku;
+    [SerializeField] private ScriptableEventVector2Int onSelect;
+    [SerializeField] private List<InputListenerBase> inputListeners;
+    [SerializeField] private BoolVariable noteModeVar;
 
 
     private GridUnit[,] m_gridUnits;
@@ -41,7 +41,7 @@ public class GameBoardVisual : MonoBehaviour
 
     private void Start()
     {
-        noteMode.OnValueChanged += OnModeChangeRaised;
+        noteModeVar.OnValueChanged += OnModeChangeRaised;
         
         if (inputListeners is { Count: > 0 })
         {
@@ -59,7 +59,7 @@ public class GameBoardVisual : MonoBehaviour
 
     private void OnDestroy()
     {
-        noteMode.OnValueChanged -= OnModeChangeRaised;
+        noteModeVar.OnValueChanged -= OnModeChangeRaised;
 
         if (inputListeners is { Count: > 0 })
         {
@@ -116,7 +116,7 @@ public class GameBoardVisual : MonoBehaviour
 
     private void OnValueInputRaised(int value)
     {
-        if(!m_selectedGridUnit)
+        if (!m_selectedGridUnit)
             return;
 
         if (m_noteMode)

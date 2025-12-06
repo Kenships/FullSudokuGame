@@ -52,42 +52,52 @@ public class GridUnit : MonoBehaviour
     
     #region Update Values
 
-    public void SetValue(int value)
+    public void SetValue(int value, bool force = false)
     {
-        Erase();
+        if(m_isLocked && !force)
+            return;
+        
+        for (int i = 0; i < 9; i++)
+        {
+            m_notes[i] = false;
+        }
+        
         m_value = value;
         UpdateVisual();
     }
 
-    public void ToggleNote(int note)
+    public void ToggleNote(int note, bool force = false)
     {
+        if(m_isLocked && !force)
+            return;
+        
         m_value = 0;
         m_notes[note - 1] = !m_notes[note - 1];
         UpdateVisual();
     }
     
-    public void AddNote(int note)
+    public void AddNote(int note, bool force = false)
     {
+        if(m_isLocked && !force)
+            return;
+        
         m_value = 0;
         m_notes[note - 1] = true;
         UpdateVisual();
     }
 
-    public void RemoveNote(int note)
+    public void RemoveNote(int note, bool force = false)
     {
+        if(m_isLocked && !force)
+            return;
+        
         m_notes[note - 1] = false;
         UpdateVisual();
     }
     
-    public void Erase()
+    public void Erase(bool force = false)
     {
-        m_value = 0;
-
-        for (int i = 0; i < 9; i++)
-        {
-            m_notes[i] = false;
-        }
-        UpdateVisual();
+        SetValue(0, force);
     }
 
     public void Lock()
@@ -199,6 +209,14 @@ public class GridUnit : MonoBehaviour
         
         return result;
     }
-    
+    public bool[] GetNotes()
+    {
+        return m_notes;
+    }
+
+    public int GetValue()
+    {
+        return m_value;
+    }
     #endregion
 }
