@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using DefaultNamespace;
+using SudokuLogic.Interface;
+using UnityEngine;
 
 namespace SudokuLogic
 {
@@ -13,28 +15,37 @@ namespace SudokuLogic
             Impossible
         }
         
-        struct GridValue
+        public struct Clue : ISudokuCell
         {
             public int Value{get; set;}
-            public readonly bool[] notes;
+            public bool[] Notes { get; }
+            public Vector2Int Position { get; }
 
-            public GridValue(int value, bool[] notes)
+            public Clue(int value, bool[] notes, Vector2Int position)
             {
-                this.Value = value;
-                this.notes = notes;
+                Value = value;
+                Notes = notes;
+                Position = position;
             }
         }
 
-        public EvaluationState EvaluateSudoku(GridUnit[,] sudokuInput)
+        private SudokuGridExtractor<Clue> m_extractor;
+        
+        public SudokuLogicCore(SudokuGridExtractor<Clue> extractor)
         {
-            GridValue[,] currentSudokuState = ParseSudokuGridUnits(sudokuInput);
+            m_extractor = extractor;
+        }
+
+        public EvaluationState EvaluateSudoku(ClueVisual[,] sudokuInput)
+        {
+            Clue[,] currentSudokuState = ParseSudokuGridUnits(sudokuInput);
             
             return IsValidSudoku(currentSudokuState) ? EvaluationState.Solved : EvaluationState.Unsolved;
         }
         
         #region Validation
 
-        private bool IsValidSudoku(GridValue[,] currentSudokuState)
+        private bool IsValidSudoku(Clue[,] currentSudokuState)
         {
             if (!IsSudokuFilled(currentSudokuState))
             {
@@ -44,9 +55,9 @@ namespace SudokuLogic
             bool[] sectionCheck = new bool[3];
             for (int i = 0; i < 9; i++)
             {
-                sectionCheck[0] = IsValidRow(currentSudokuState, i);
-                sectionCheck[1] = IsValidCol(currentSudokuState, i);
-                sectionCheck[2] = IsValidBox(currentSudokuState, i);
+                sectionCheck[0] = IsValidSection(currentSudokuState, ExtractorType.row, i);
+                sectionCheck[1] = IsValidSection(currentSudokuState, ExtractorType.column, i);
+                sectionCheck[2] = IsValidSection(currentSudokuState, ExtractorType.box, i);
                 
                 if (!IsAllTrue(sectionCheck))
                 {
@@ -57,55 +68,18 @@ namespace SudokuLogic
             return true;
         }
 
-        private bool IsValidRow(GridValue[,] currentSudokuState, int row)
+        private bool IsValidSection(Clue[,] currentSudokuState, ExtractorType extractorType, int index)
         {
+            Clue[] boxValues = m_extractor.ExtractFrom(currentSudokuState, extractorType, index);
             bool[] valueCheck = new bool[10];
-            for (int col = 0; col < 9; col++)
+            foreach (Clue value in boxValues)
             {
-                valueCheck[currentSudokuState[row, col].Value] = true;
+                valueCheck[value.Value] = true;
             }
-            
             return IsAllTrue(valueCheck, true);
         }
 
-        private bool IsValidCol(GridValue[,] currentSudokuState, int col)
-        {
-            bool[] valueCheck = new bool[10];
-            for (int row = 0; row < 9; row++)
-            {
-                valueCheck[currentSudokuState[row, col].Value] = true;
-            }
-            
-            return IsAllTrue(valueCheck, true);
-        }
-
-        private bool IsValidBox(GridValue[,] currentSudokuState, int boxNumber)
-        {
-            int boxRow = boxNumber / 3;
-            int boxCol = boxNumber % 3;
-            
-            return IsValidBox(currentSudokuState, boxRow, boxCol);
-        }
-
-        private bool IsValidBox(GridValue[,] currentSudokuState, int row, int col)
-        {
-            int boxRow = row / 3 * 3;
-            int boxCol = col / 3 * 3;
-            
-            bool[] valueCheck = new bool[10];
-
-            for (int r = boxRow; r < boxRow + 3; r++)
-            {
-                for (int c = boxCol; c < boxCol + 3; c++)
-                {
-                    valueCheck[currentSudokuState[r, c].Value] = true;
-                }
-            }
-            
-            return IsAllTrue(valueCheck, true);
-        }
-
-        private bool IsSudokuFilled(GridValue[,] currentSudokuState)
+        private bool IsSudokuFilled(Clue[,] currentSudokuState)
         {
             for (int r = 0; r < 9; r++)
             {
@@ -124,16 +98,16 @@ namespace SudokuLogic
         
         #region Util
 
-        private GridValue[,] ParseSudokuGridUnits(GridUnit[,] sudoku)
+        private Clue[,] ParseSudokuGridUnits(ClueVisual[,] sudoku)
         {
-            GridValue[,] parsedSudoku = new GridValue[9, 9];
+            Clue[,] parsedSudoku = new Clue[9, 9];
             for (int row = 0; row < 9; row++)
             {
                 for (int col = 0; col < 9; col++)
                 {
-                    GridUnit unit = sudoku[row, col];
-                    GridValue sudokuValue = new GridValue(unit.GetValue(), unit.GetNotes());
-                    parsedSudoku[row, col] = sudokuValue;
+                    ClueVisual unit = sudoku[row, col];
+                    Clue sudokuClue = new Clue(unit.Value, unit.Notes, new Vector2Int(row, col));
+                    parsedSudoku[row, col] = sudokuClue;
                 }
             }
             return parsedSudoku;

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using DefaultNamespace;
 using Obvious.Soap;
+using SudokuLogic.Interface;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GridUnit : MonoBehaviour
+public class ClueVisual : MonoBehaviour, ISudokuCell
 {
     #region Constants
     private const string MSPACE = "<mspace=0.5em>";
@@ -30,8 +32,10 @@ public class GridUnit : MonoBehaviour
     #endregion
     public Vector2Int Position { get; private set; }
 
-    private int m_value;
-    private bool[] m_notes;
+    public int Value { get; set; }
+    public bool[] Notes { get; private set; }
+
+    
     private bool m_isLocked;
     
     private bool[] m_boldNotes;
@@ -39,8 +43,8 @@ public class GridUnit : MonoBehaviour
     public void Initialize(Vector2Int position, int value, bool lockNumber = false)
     {
         Position = position;
-        m_value = value;
-        m_notes = new bool[9];
+        Value = value;
+        Notes = new bool[9];
         m_boldNotes = new bool[9];
         m_isLocked = lockNumber;
     }
@@ -59,10 +63,10 @@ public class GridUnit : MonoBehaviour
         
         for (int i = 0; i < 9; i++)
         {
-            m_notes[i] = false;
+            Notes[i] = false;
         }
         
-        m_value = value;
+        Value = value;
         UpdateVisual();
     }
 
@@ -71,8 +75,8 @@ public class GridUnit : MonoBehaviour
         if(m_isLocked && !force)
             return;
         
-        m_value = 0;
-        m_notes[note - 1] = !m_notes[note - 1];
+        Value = 0;
+        Notes[note - 1] = !Notes[note - 1];
         UpdateVisual();
     }
     
@@ -81,8 +85,8 @@ public class GridUnit : MonoBehaviour
         if(m_isLocked && !force)
             return;
         
-        m_value = 0;
-        m_notes[note - 1] = true;
+        Value = 0;
+        Notes[note - 1] = true;
         UpdateVisual();
     }
 
@@ -91,7 +95,7 @@ public class GridUnit : MonoBehaviour
         if(m_isLocked && !force)
             return;
         
-        m_notes[note - 1] = false;
+        Notes[note - 1] = false;
         UpdateVisual();
     }
     
@@ -114,17 +118,17 @@ public class GridUnit : MonoBehaviour
     #endregion
 
     #region UpdateVisual
-    private void UpdateVisual()
+    public void UpdateVisual()
     {
-        if (m_value == 0 && IsNotesEmpty())
+        if (Value == 0 && IsNotesEmpty())
         {
             text.gameObject.SetActive(false);
             return;
         }
-        if (m_value != 0)
+        if (Value != 0)
         {
             text.fontSize = valueSize;
-            text.text = m_value.ToString();
+            text.text = Value.ToString();
         }
         else
         {
@@ -154,7 +158,7 @@ public class GridUnit : MonoBehaviour
 
     public void BoldNote(int note)
     {
-        if (!m_notes[note - 1] || m_value != 0) return;
+        if (!Notes[note - 1] || Value != 0) return;
         
         m_boldNotes[note - 1] = true;
         UpdateVisual();
@@ -162,8 +166,6 @@ public class GridUnit : MonoBehaviour
 
     public void UnboldNote(int note, bool update = true)
     {
-        if (!m_boldNotes[note - 1]) return;
-        
         m_boldNotes[note - 1] = false;
         
         if (update)
@@ -176,6 +178,7 @@ public class GridUnit : MonoBehaviour
         {
             UnboldNote(r, false);
         }
+        UpdateVisual();
     }
 
     #endregion
@@ -186,7 +189,7 @@ public class GridUnit : MonoBehaviour
     {
         for (int i = 0; i < 9; i++)
         {
-            if (m_notes[i]) return false;
+            if (Notes[i]) return false;
         }
         
         return true;
@@ -197,7 +200,7 @@ public class GridUnit : MonoBehaviour
         string result = MSPACE;
         for (int i = 0; i < 9; i++)
         {
-            if (m_notes[i])
+            if (Notes[i])
             {
                 result += m_boldNotes[i] ? "<b>" + (i + 1) + "</b>": i + 1;
             }
@@ -209,24 +212,22 @@ public class GridUnit : MonoBehaviour
         
         return result;
     }
-    public bool[] GetNotes()
-    {
-        return m_notes;
-    }
-
-    public int GetValue()
-    {
-        return m_value;
-    }
+    
 
     public bool HasNote(int note)
     {
-        return m_notes[note - 1];
+        return Notes[note - 1];
     }
 
     public bool IsEmpty()
     {
-        return IsNotesEmpty() && m_value == 0;
+        return IsNotesEmpty() && Value == 0;
     }
+
+    public override string ToString()
+    {
+        return Position + "Value: " + Value + " Notes: " + NoteString();
+    }
+
     #endregion
 }
